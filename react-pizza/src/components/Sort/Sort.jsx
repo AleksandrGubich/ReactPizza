@@ -1,17 +1,16 @@
 import React from "react";
 
-function Sort() {
+function Sort({ value, onChangeSort }) {
   const list = ["популярности", "цене", "алфавиту"];
 
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState(0);
 
   const onClickListItem = (index) => {
-    setSelected(index);
+    onChangeSort(index);
     setOpen(false);
   };
 
-  const sortName = list[selected];
+  const sortName = list[value];
 
   return (
     <div className="sort">
@@ -37,7 +36,7 @@ function Sort() {
             {list.map((name, index) => (
               <li
                 key={index}
-                className={selected === index ? "active" : ""}
+                className={value === index ? "active" : ""}
                 onClick={() => onClickListItem(index)}
               >
                 {name}

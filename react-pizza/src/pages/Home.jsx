@@ -15,6 +15,7 @@ import {
 import axios from "axios";
 import qs from "qs";
 import { useNavigate } from "react-router-dom";
+import { setItems } from "../redux/slices/pizzaSlice";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -25,9 +26,9 @@ const Home = () => {
   const { categoryId, sort, currentPage } = useSelector(
     (state) => state.filter
   );
+  const items = useSelector((state) => state.pizza.items);
 
   const { searchValue } = React.useContext(SearchContext);
-  const [items, setItems] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const onChangeCategory = (id) => {
@@ -38,7 +39,7 @@ const Home = () => {
     dispatch(setCurrentPage(number));
   };
 
-  const fetchPizzas = () => {
+  const fetchPizzas = async () => {
     setIsLoading(true);
 
     const sortBy = sort.sortProperty.replace("-", "");
@@ -46,14 +47,16 @@ const Home = () => {
     const category = categoryId > 0 ? `category=${categoryId}` : "";
     const search = searchValue ? `&search=${searchValue}` : "";
 
-    axios
-      .get(
+    try {
+      const { data } = await axios.get(
         `https://68e7a27e10e3f82fbf400722.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`
-      )
-      .then((res) => {
-        setItems(res.data);
-        setIsLoading(false);
-      });
+      );
+      dispatch(setItems(data));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   React.useEffect(() => {
